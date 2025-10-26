@@ -1,0 +1,38 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    char ch;
+    Node *prev, *next;
+};
+
+int main() {
+    // Read a word (no spaces). Example: level, abba, abc
+    char s[300];
+    cout << "Enter characters (no spaces): ";
+    cin >> s;
+
+    // Build Doubly Linked List from the input
+    Node *head = NULL, *tail = NULL, *p;
+    for (int i = 0; s[i] != '\0'; i++) {
+        p = new Node;
+        p->ch = s[i];
+        p->next = NULL;
+        p->prev = tail;
+        if (head == NULL) head = p;
+        else tail->next = p;
+        tail = p;
+    }
+
+    // Two-pointer check from both ends
+    Node *left = head, *right = tail;
+    bool ok = true;
+    while (left != NULL && right != NULL && left != right && right->next != left) {
+        if (left->ch != right->ch) { ok = false; break; }
+        left = left->next;
+        right = right->prev;
+    }
+
+    cout << (ok ? "Palindrome" : "Not Palindrome") << endl;
+    return 0;
+}
