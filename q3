@@ -1,0 +1,72 @@
+#include <iostream>
+using namespace std;
+
+// -------------------- DOUBLY LINKED LIST --------------------
+struct DNode {
+    int data;
+    DNode* prev;
+    DNode* next;
+};
+
+int sizeOfDLL(DNode* head) {
+    int count = 0;
+    while (head != NULL) {
+        count++;
+        head = head->next;
+    }
+    return count;
+}
+
+// -------------------- CIRCULAR LINKED LIST --------------------
+struct CNode {
+    int data;
+    CNode* next;
+};
+
+int sizeOfCLL(CNode* tail) {
+    if (tail == NULL) return 0;
+    int count = 0;
+    CNode* p = tail->next;   // head node
+    do {
+        count++;
+        p = p->next;
+    } while (p != tail->next);
+    return count;
+}
+
+// -------------------- MAIN PROGRAM --------------------
+int main() {
+    // Create Doubly Linked List: 10 <-> 20 <-> 30
+    DNode *head = NULL, *temp = NULL, *last = NULL;
+    int dllValues[] = {10, 20, 30};
+    for (int i = 0; i < 3; i++) {
+        temp = new DNode;
+        temp->data = dllValues[i];
+        temp->next = NULL;
+        temp->prev = last;
+        if (head == NULL) head = temp;
+        else last->next = temp;
+        last = temp;
+    }
+
+    // Create Circular Linked List: 5 → 15 → 25 → (back to 5)
+    CNode *tail = NULL, *p;
+    int cllValues[] = {5, 15, 25};
+    for (int i = 0; i < 3; i++) {
+        p = new CNode;
+        p->data = cllValues[i];
+        if (tail == NULL) {
+            tail = p;
+            tail->next = tail;
+        } else {
+            p->next = tail->next;
+            tail->next = p;
+            tail = p;
+        }
+    }
+
+    cout << "Size of Doubly Linked List: " << sizeOfDLL(head) << endl;
+    cout << "Size of Circular Linked List: " << sizeOfCLL(tail) << endl;
+
+    return 0;
+}
