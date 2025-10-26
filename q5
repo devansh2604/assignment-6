@@ -1,0 +1,60 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node *prev, *next;
+};
+
+void display(Node* head) {
+    Node* p = head;
+    while (p != NULL) {
+        cout << p->data << " ";
+        p = p->next;
+    }
+    cout << endl;
+}
+
+int main() {
+    int n, x;
+    cout << "Enter number of nodes: ";
+    cin >> n;
+
+    Node *head = NULL, *tail = NULL, *p;
+
+    cout << "Enter " << n << " elements: ";
+    for (int i = 0; i < n; i++) {
+        cin >> x;
+        p = new Node;
+        p->data = x;
+        p->next = NULL;
+        p->prev = tail;
+        if (head == NULL)
+            head = p;
+        else
+            tail->next = p;
+        tail = p;
+    }
+
+    cout << "\nOriginal List: ";
+    display(head);
+
+    // Reversing the doubly linked list
+    Node* curr = head;
+    Node* temp = NULL;
+
+    while (curr != NULL) {
+        temp = curr->prev;
+        curr->prev = curr->next;
+        curr->next = temp;
+        curr = curr->prev;
+    }
+
+    if (temp != NULL)
+        head = temp->prev; // new head (last processed node)
+
+    cout << "Reversed List: ";
+    display(head);
+
+    return 0;
+}
