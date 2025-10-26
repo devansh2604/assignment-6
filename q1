@@ -1,0 +1,223 @@
+#include <iostream>
+using namespace std;
+
+// ---------- Doubly Linked List ----------
+struct DNode {
+    int data;
+    DNode *prev, *next;
+};
+DNode* dhead = NULL;
+
+DNode* newDNode(int x) {
+    DNode* p = new DNode;
+    p->data = x;
+    p->prev = p->next = NULL;
+    return p;
+}
+
+void dDisplay() {
+    if (!dhead) { cout << "DLL Empty\n"; return; }
+    DNode* p = dhead;
+    cout << "Doubly Linked List: ";
+    while (p) { cout << p->data << " "; p = p->next; }
+    cout << endl;
+}
+
+DNode* dSearch(int key) {
+    DNode* p = dhead;
+    while (p && p->data != key) p = p->next;
+    return p;
+}
+
+void dInsertFirst(int x) {
+    DNode* p = newDNode(x);
+    if (dhead) dhead->prev = p;
+    p->next = dhead;
+    dhead = p;
+}
+
+void dInsertLast(int x) {
+    DNode* p = newDNode(x);
+    if (!dhead) { dhead = p; return; }
+    DNode* q = dhead;
+    while (q->next) q = q->next;
+    q->next = p;
+    p->prev = q;
+}
+
+void dInsertAfter(int key, int x) {
+    DNode* q = dSearch(key);
+    if (!q) { cout << "Key not found\n"; return; }
+    DNode* p = newDNode(x);
+    p->next = q->next;
+    p->prev = q;
+    if (q->next) q->next->prev = p;
+    q->next = p;
+}
+
+void dInsertBefore(int key, int x) {
+    DNode* q = dSearch(key);
+    if (!q) { cout << "Key not found\n"; return; }
+    if (q == dhead) { dInsertFirst(x); return; }
+    DNode* p = newDNode(x);
+    p->next = q;
+    p->prev = q->prev;
+    q->prev->next = p;
+    q->prev = p;
+}
+
+void dDelete(int key) {
+    DNode* q = dSearch(key);
+    if (!q) { cout << "Value not found\n"; return; }
+    if (q->prev) q->prev->next = q->next;
+    else dhead = q->next;
+    if (q->next) q->next->prev = q->prev;
+    delete q;
+    cout << "Deleted " << key << endl;
+}
+
+// ---------- Circular Linked List ----------
+struct CNode {
+    int data;
+    CNode* next;
+};
+CNode* tail = NULL;
+
+CNode* newCNode(int x) {
+    CNode* p = new CNode;
+    p->data = x;
+    p->next = NULL;
+    return p;
+}
+
+void cDisplay() {
+    if (!tail) { cout << "CLL Empty\n"; return; }
+    cout << "Circular Linked List: ";
+    CNode* p = tail->next;
+    do {
+        cout << p->data << " ";
+        p = p->next;
+    } while (p != tail->next);
+    cout << endl;
+}
+
+CNode* cSearch(int key) {
+    if (!tail) return NULL;
+    CNode* p = tail->next;
+    do {
+        if (p->data == key) return p;
+        p = p->next;
+    } while (p != tail->next);
+    return NULL;
+}
+
+void cInsertFirst(int x) {
+    CNode* p = newCNode(x);
+    if (!tail) {
+        tail = p;
+        tail->next = tail;
+    } else {
+        p->next = tail->next;
+        tail->next = p;
+    }
+}
+
+void cInsertLast(int x) {
+    cInsertFirst(x);
+    tail = tail->next; // move tail to new node
+}
+
+void cInsertAfter(int key, int x) {
+    if (!tail) { cout << "List empty\n"; return; }
+    CNode* q = cSearch(key);
+    if (!q) { cout << "Key not found\n"; return; }
+    CNode* p = newCNode(x);
+    p->next = q->next;
+    q->next = p;
+    if (q == tail) tail = p;
+}
+
+void cInsertBefore(int key, int x) {
+    if (!tail) { cout << "List empty\n"; return; }
+    CNode* p = tail->next, *prev = tail;
+    do {
+        if (p->data == key) {
+            CNode* n = newCNode(x);
+            n->next = p;
+            prev->next = n;
+            if (p == tail->next) ; // head changed logically
+            return;
+        }
+        prev = p;
+        p = p->next;
+    } while (p != tail->next);
+    cout << "Key not found\n";
+}
+
+void cDelete(int key) {
+    if (!tail) { cout << "Empty\n"; return; }
+    CNode* p = tail->next, *prev = tail;
+    do {
+        if (p->data == key) {
+            if (p == prev) { // one node
+                delete p;
+                tail = NULL;
+            } else {
+                prev->next = p->next;
+                if (p == tail) tail = prev;
+                delete p;
+            }
+            cout << "Deleted " << key << endl;
+            return;
+        }
+        prev = p;
+        p = p->next;
+    } while (p != tail->next);
+    cout << "Not found\n";
+}
+
+// ---------- Main Menu ----------
+int main() {
+    int ch, x, key, listType;
+
+    cout << "1. Doubly Linked List\n2. Circular Linked List\nChoose list type: ";
+    cin >> listType;
+
+    if (listType == 1) {
+        do {
+            cout << "\nDOUBLY LINKED LIST MENU\n"
+                 << "1.Insert First\n2.Insert Last\n3.Insert After\n4.Insert Before\n"
+                 << "5.Delete by value\n6.Search\n7.Display\n8.Exit\nChoice: ";
+            cin >> ch;
+            if (ch == 1) { cout << "Value: "; cin >> x; dInsertFirst(x); }
+            else if (ch == 2) { cout << "Value: "; cin >> x; dInsertLast(x); }
+            else if (ch == 3) { cout << "Key and Value: "; cin >> key >> x; dInsertAfter(key, x); }
+            else if (ch == 4) { cout << "Key and Value: "; cin >> key >> x; dInsertBefore(key, x); }
+            else if (ch == 5) { cout << "Value to delete: "; cin >> key; dDelete(key); }
+            else if (ch == 6) { cout << "Search value: "; cin >> key; cout << (dSearch(key) ? "Found\n" : "Not Found\n"); }
+            else if (ch == 7) dDisplay();
+        } while (ch != 8);
+    }
+
+    else if (listType == 2) {
+        do {
+            cout << "\nCIRCULAR LINKED LIST MENU\n"
+                 << "1.Insert First\n2.Insert Last\n3.Insert After\n4.Insert Before\n"
+                 << "5.Delete by value\n6.Search\n7.Display\n8.Exit\nChoice: ";
+            cin >> ch;
+            if (ch == 1) { cout << "Value: "; cin >> x; cInsertFirst(x); }
+            else if (ch == 2) { cout << "Value: "; cin >> x; cInsertLast(x); }
+            else if (ch == 3) { cout << "Key and Value: "; cin >> key >> x; cInsertAfter(key, x); }
+            else if (ch == 4) { cout << "Key and Value: "; cin >> key >> x; cInsertBefore(key, x); }
+            else if (ch == 5) { cout << "Value to delete: "; cin >> key; cDelete(key); }
+            else if (ch == 6) { cout << "Search value: "; cin >> key; cout << (cSearch(key) ? "Found\n" : "Not Found\n"); }
+            else if (ch == 7) cDisplay();
+        } while (ch != 8);
+    }
+
+    else {
+        cout << "Invalid choice.\n";
+    }
+
+    return 0;
+}
